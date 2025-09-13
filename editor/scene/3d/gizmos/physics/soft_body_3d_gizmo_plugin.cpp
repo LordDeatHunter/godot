@@ -80,13 +80,20 @@ void SoftBody3DGizmoPlugin::redraw(EditorNode3DGizmo *p_gizmo) {
 
 	Ref<TriangleMesh> tm = soft_body->get_mesh()->generate_triangle_mesh();
 
-	Vector<Vector3> points;
+	HashSet<Vector3> unique_points;
 	for (int i = 0; i < soft_body->get_mesh()->get_surface_count(); i++) {
 		Array arrays = soft_body->get_mesh()->surface_get_arrays(i);
 		ERR_CONTINUE(arrays.is_empty());
 
 		const Vector<Vector3> &vertices = arrays[Mesh::ARRAY_VERTEX];
-		points.append_array(vertices);
+		for (int j = 0; j < vertices.size(); j++) {
+			unique_points.insert(vertices[j]);
+		}
+	}
+
+	Vector<Vector3> points;
+	for (const Vector3 &point : unique_points) {
+		points.push_back(point);
 	}
 
 	Ref<Material> material = get_material("shape_material", p_gizmo);
